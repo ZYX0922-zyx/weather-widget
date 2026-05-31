@@ -70,7 +70,6 @@ weather-widget/
 └── install.bat          # One-click install (creates desktop shortcut)
 ```
 
-
 ## License
 
 [MIT](./LICENSE)

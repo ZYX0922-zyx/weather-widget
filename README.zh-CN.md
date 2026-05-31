@@ -47,17 +47,6 @@ $env:WIDGET_LANG = "zh-CN"   # 或 en
 | `WIDGET_ELECTRON_ARGS` | 额外 Electron 参数 |
 | `WIDGET_LANG` | 界面语言 |
 
-## 上架 GitHub
-
-```bash
-git init
-git add .
-git commit -m "首次发布：透明桌面天气组件"
-git branch -M main
-git remote add origin https://github.com/你的用户名/weather-widget.git
-git push -u origin main
-```
-
 详细开发问题与修复过程见 [docs/TROUBLESHOOTING.zh-CN.md](./docs/TROUBLESHOOTING.zh-CN.md)。
 
 ## 许可证
