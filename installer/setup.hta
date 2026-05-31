@@ -1,0 +1,312 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>天气组件 - 下载安装</title>
+  <hta:application
+    id="WeatherWidgetSetup"
+    applicationname="天气组件安装"
+    border="dialog"
+    borderstyle="normal"
+    caption="yes"
+    maximize="no"
+    minimize="no"
+    showintaskbar="yes"
+    singleinstance="yes"
+    sysmenu="yes"
+    windowstate="normal"
+    scroll="no"
+    innerwidth="500"
+    innerheight="540"
+  />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    body {
+      font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+      color: #e8f1fa;
+      background: rgba(18, 36, 58, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 22px 24px 18px;
+    }
+    .card {
+      width: 100%;
+      height: 100%;
+    }
+    .head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+    .head img { width: 48px; height: 48px; }
+    h1 { font-size: 21px; font-weight: 600; }
+    .sub { color: rgba(232, 241, 250, 0.72); font-size: 12px; margin-top: 3px; }
+    label { display: block; font-size: 12px; margin: 12px 0 6px; color: rgba(232, 241, 250, 0.85); }
+    select, input[type=text] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(0, 0, 0, 0.25);
+      color: #fff;
+      font-size: 13px;
+    }
+    .path-row { display: flex; gap: 8px; }
+    .path-row input { flex: 1; }
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    button:disabled { opacity: 0.45; cursor: default; }
+    .btn-secondary { background: rgba(255, 255, 255, 0.14); color: #fff; white-space: nowrap; }
+    .btn-primary { background: #3d8fd4; color: #fff; width: 100%; margin-top: 14px; padding: 11px; font-size: 14px; }
+    .log {
+      margin-top: 12px;
+      min-height: 52px;
+      max-height: 72px;
+      overflow: auto;
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.28);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 12px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      color: rgba(232, 241, 250, 0.88);
+    }
+    .hint { margin-top: 10px; font-size: 11px; color: rgba(232, 241, 250, 0.5); line-height: 1.45; }
+    .check-row {
+      margin-top: 8px;
+      font-size: 12px;
+      color: rgba(232, 241, 250, 0.88);
+    }
+    .check-row input { margin-right: 8px; vertical-align: middle; }
+  </style>
+</head>
+<body onload="initPage()">
+  <div class="card">
+    <div class="head">
+      <img id="appIcon" src="../assets/icon.png" alt="">
+      <div>
+        <h1 id="titleText">天气组件</h1>
+        <div class="sub" id="subtitleText">透明桌面天气小工具 - 下载与安装</div>
+      </div>
+    </div>
+
+    <label id="labelLang" for="langSelect">界面语言</label>
+    <select id="langSelect" onchange="applyUiLanguage()">
+      <option value="zh-CN">简体中文</option>
+      <option value="en">English</option>
+    </select>
+
+    <label id="labelPath" for="installPath">安装位置</label>
+    <div class="path-row">
+      <input type="text" id="installPath">
+      <button type="button" class="btn-secondary" id="btnBrowse" onclick="browseFolder()">浏览...</button>
+    </div>
+
+    <label class="check-row" id="labelShortcut">
+      <input type="checkbox" id="createShortcut">
+      <span id="shortcutText">创建桌面快捷方式</span>
+    </label>
+
+    <label class="check-row" id="labelAutoStart">
+      <input type="checkbox" id="autoStart">
+      <span id="autoStartText">开机自动启动</span>
+    </label>
+
+    <button type="button" class="btn-primary" id="btnInstall" onclick="runInstall()">开始安装</button>
+
+    <div class="log" id="logBox"></div>
+    <div class="hint" id="hintText"></div>
+  </div>
+
+  <script type="text/javascript">
+    var fso = new ActiveXObject("Scripting.FileSystemObject");
+    var shell = new ActiveXObject("WScript.Shell");
+    var sourceRoot = "";
+    var uiLang = "zh-CN";
+
+    var I18N = {
+      "zh-CN": {
+        title: "天气组件",
+        subtitle: "透明桌面天气小工具 - 下载与安装",
+        labelLang: "界面语言（安装后启动时生效）",
+        labelPath: "安装位置",
+        labelShortcut: "创建桌面快捷方式",
+        labelAutoStart: "开机自动启动",
+        browse: "浏览...",
+        install: "开始安装",
+        hint: "若未创建快捷方式，请到安装目录运行 scripts\\launch.vbs 启动。卸载请运行安装目录中的 uninstall.bat。",
+        hintWithShortcut: "安装完成后请使用桌面快捷方式「天气组件」启动。卸载请运行安装目录中的 uninstall.bat。",
+        logReady: "请选择安装位置与界面语言，然后点击「开始安装」。",
+        installing: "正在安装，请稍候...",
+        installOk: "安装完成，窗口即将关闭。",
+        installOkShortcut: "安装完成，窗口即将关闭。请从桌面快捷方式启动。",
+        installFail: "安装失败，请检查是否已安装 Node.js。",
+        pickFolder: "选择安装目录"
+      },
+      en: {
+        title: "Weather Widget",
+        subtitle: "Transparent desktop weather widget - Download & Install",
+        labelLang: "UI language (applied after install)",
+        labelPath: "Install location",
+        labelShortcut: "Create desktop shortcut",
+        labelAutoStart: "Start automatically on login",
+        browse: "Browse...",
+        install: "Install",
+        hint: "If no shortcut is created, run scripts\\launch.vbs in the install folder. To uninstall, run uninstall.bat there.",
+        hintWithShortcut: "After install, launch from the desktop shortcut. To uninstall, run uninstall.bat in the install folder.",
+        logReady: "Choose install folder and language, then click Install.",
+        installing: "Installing, please wait...",
+        installOk: "Install complete. Closing window.",
+        installOkShortcut: "Install complete. Closing window. Use the desktop shortcut to launch.",
+        installFail: "Install failed. Check that Node.js is installed.",
+        pickFolder: "Choose install folder"
+      }
+    };
+
+    function t(key) {
+      var pack = I18N[uiLang] || I18N["zh-CN"];
+      return pack[key] || key;
+    }
+
+    function applyUiLanguage() {
+      uiLang = document.getElementById("langSelect").value;
+      document.getElementById("titleText").innerText = t("title");
+      document.getElementById("subtitleText").innerText = t("subtitle");
+      document.getElementById("labelLang").innerText = t("labelLang");
+      document.getElementById("labelPath").innerText = t("labelPath");
+      document.getElementById("shortcutText").innerText = t("labelShortcut");
+      document.getElementById("autoStartText").innerText = t("labelAutoStart");
+      document.getElementById("btnBrowse").innerText = t("browse");
+      document.getElementById("btnInstall").innerText = t("install");
+      updateHintText();
+    }
+
+    function updateHintText() {
+      var createShortcut = document.getElementById("createShortcut").checked;
+      document.getElementById("hintText").innerText = createShortcut ? t("hintWithShortcut") : t("hint");
+    }
+
+    function setLog(text) {
+      document.getElementById("logBox").innerText = text;
+    }
+
+    function resolveSourceRoot() {
+      var path = unescape(document.location.pathname || "");
+      if (path.charAt(0) === "/") path = path.substring(1);
+      path = path.replace(/\//g, "\\");
+      var installerDir = fso.GetParentFolderName(path);
+      return fso.GetParentFolderName(installerDir);
+    }
+
+    function loadSavedSettings() {
+      try {
+        var settingsPath = shell.ExpandEnvironmentStrings("%APPDATA%\\weather-widget\\settings.json");
+        if (!fso.FileExists(settingsPath)) return;
+        var file = fso.OpenTextFile(settingsPath, 1, false, -1);
+        var raw = file.ReadAll();
+        file.Close();
+        var langMatch = raw.match(/"lang"\s*:\s*"([^"]+)"/);
+        var pathMatch = raw.match(/"installPath"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"/);
+        var shortcutMatch = raw.match(/"createDesktopShortcut"\s*:\s*(true|false)/);
+        var autoStartMatch = raw.match(/"autoStart"\s*:\s*(true|false)/);
+        if (langMatch && langMatch[1]) {
+          document.getElementById("langSelect").value = langMatch[1];
+          uiLang = langMatch[1];
+        }
+        if (pathMatch && pathMatch[1]) {
+          document.getElementById("installPath").value = pathMatch[1].replace(/\\\\/g, "\\");
+        }
+        if (shortcutMatch && shortcutMatch[1]) {
+          document.getElementById("createShortcut").checked = (shortcutMatch[1] === "true");
+        }
+        if (autoStartMatch && autoStartMatch[1]) {
+          document.getElementById("autoStart").checked = (autoStartMatch[1] === "true");
+        }
+      } catch (e) {}
+    }
+
+    function initPage() {
+      sourceRoot = resolveSourceRoot();
+      var defaultPath = shell.ExpandEnvironmentStrings("%LOCALAPPDATA%") + "\\Programs\\WeatherWidget";
+      document.getElementById("installPath").value = defaultPath;
+      document.getElementById("createShortcut").checked = false;
+      document.getElementById("autoStart").checked = false;
+      document.getElementById("createShortcut").onclick = updateHintText;
+      loadSavedSettings();
+      applyUiLanguage();
+      setLog(t("logReady"));
+      resizeToCard();
+    }
+
+    function resizeToCard() {
+      try {
+        window.resizeTo(520, 580);
+      } catch (e) {}
+    }
+
+    function browseFolder() {
+      try {
+        var picker = new ActiveXObject("Shell.Application").BrowseForFolder(0, t("pickFolder"), 0);
+        if (!picker) return;
+        var folder = picker.Items().Item();
+        if (folder) {
+          document.getElementById("installPath").value = folder.Path;
+        }
+      } catch (e) {
+        setLog(String(e.message || e));
+      }
+    }
+
+    function setBusy(busy) {
+      document.getElementById("btnInstall").disabled = busy;
+      document.getElementById("btnBrowse").disabled = busy;
+    }
+
+    function closeSetupWindow(delayMs) {
+      window.setTimeout(function () {
+        try {
+          window.close();
+        } catch (e) {}
+      }, delayMs || 600);
+    }
+
+    function runInstall() {
+      var installPath = document.getElementById("installPath").value.replace(/^\s+|\s+$/g, "");
+      var lang = document.getElementById("langSelect").value;
+      var createShortcut = document.getElementById("createShortcut").checked;
+      var autoStart = document.getElementById("autoStart").checked;
+      if (!installPath) {
+        setLog(t("installFail"));
+        return;
+      }
+
+      setBusy(true);
+      setLog(t("installing"));
+
+      var ps1 = sourceRoot + "\\scripts\\install-core.ps1";
+      var cmd = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"" + ps1 + "\" -InstallPath \"" + installPath + "\" -Lang \"" + lang + "\" -SourceRoot \"" + sourceRoot + "\"";
+      if (createShortcut) {
+        cmd += " -CreateShortcut";
+      }
+      if (autoStart) {
+        cmd += " -AutoStart";
+      }
+      var code = shell.Run(cmd, 0, true);
+      setBusy(false);
+
+      if (code === 0) {
+        setLog(createShortcut ? t("installOkShortcut") : t("installOk"));
+        closeSetupWindow(700);
+      } else {
+        setLog(t("installFail") + " (code " + code + ")");
+      }
+    }
+  </script>
+</body>
+</html>

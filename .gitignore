@@ -1,0 +1,12 @@
+node_modules/
+.electron-cache/
+.launch-out.txt
+.launch-err.txt
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+desktop.ini
+dist/
+out/
+*.asar

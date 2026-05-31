@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src https://api.open-meteo.com https://geocoding-api.open-meteo.com https://api.bigdatacloud.net">
+  <title></title>
+  <link rel="icon" href="../assets/icon.png" type="image/png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="widget" id="widget">
+    <div class="widget-hit-ring" aria-hidden="true">
+      <div class="hit-ring-surface"></div>
+    </div>
+    <div class="widget-frame" id="widgetFrame"></div>
+
+    <div class="resize-handles" id="resizeHandles">
+      <div class="resize-edge resize-n" data-edge="top"></div>
+      <div class="resize-edge resize-s" data-edge="bottom"></div>
+      <div class="resize-edge resize-e" data-edge="right"></div>
+      <div class="resize-edge resize-w" data-edge="left"></div>
+      <div class="resize-edge resize-ne" data-edge="top-right"></div>
+      <div class="resize-edge resize-nw" data-edge="top-left"></div>
+      <div class="resize-edge resize-se" data-edge="bottom-right"></div>
+      <div class="resize-edge resize-sw" data-edge="bottom-left"></div>
+    </div>
+
+    <div class="float-toolbar" id="floatToolbar">
+      <button class="glass-btn glass-btn-sm" id="btnCitySearch" type="button" data-i18n-title="btn.searchCity" title="搜索城市">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"/>
+          <line x1="16.5" y1="16.5" x2="21" y2="21"/>
+        </svg>
+      </button>
+      <button class="glass-btn glass-btn-sm" id="btnLocate" type="button" data-i18n-title="btn.locate" title="定位">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+        </svg>
+      </button>
+      <button class="glass-btn glass-btn-sm" id="btnRefresh" type="button" data-i18n-title="btn.refresh" title="刷新">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12a9 9 0 1 1-2.64-6.36"/>
+          <polyline points="21 3 21 9 15 9"/>
+        </svg>
+      </button>
+      <button class="glass-btn glass-btn-sm" id="btnMinimize" type="button" data-i18n-title="btn.hide" title="隐藏">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
+      <button class="glass-btn glass-btn-sm glass-btn-danger" id="btnClose" type="button" data-i18n-title="btn.close" title="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="compact-bar" id="compactBar">
+      <div class="compact-bar-shell">
+        <div class="compact-bar-inner" id="compactBarDrag">
+          <div class="compact-content">
+            <img class="compact-icon" id="compactIcon" src="" alt="">
+            <span class="compact-city" id="compactCity">--</span>
+            <span class="compact-temp" id="compactTemp">--°C</span>
+            <span class="compact-desc" id="compactDesc">--</span>
+          </div>
+        </div>
+        <div class="compact-toolbar" id="compactToolbar">
+          <button class="glass-btn glass-btn-sm" id="btnExpand" type="button" data-i18n-title="btn.expand" title="放大">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 3 21 3 21 9"/>
+              <polyline points="9 21 3 21 3 15"/>
+              <line x1="21" y1="3" x2="14" y2="10"/>
+              <line x1="3" y1="21" x2="10" y2="14"/>
+            </svg>
+          </button>
+          <button class="glass-btn glass-btn-sm glass-btn-danger" id="btnCompactClose" type="button" data-i18n-title="btn.close" title="关闭">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="vertical-bar" id="verticalBar">
+      <div class="vertical-bar-shell">
+        <div class="vertical-bar-inner" id="verticalBarDrag">
+          <img class="vertical-icon" id="verticalIcon" src="" alt="">
+          <div class="vertical-text">
+            <span class="vertical-temp" id="verticalTemp">--°</span>
+            <span class="vertical-city" id="verticalCity">--</span>
+            <span class="vertical-desc" id="verticalDesc">--</span>
+          </div>
+        </div>
+        <div class="vertical-toolbar" id="verticalToolbar">
+          <button class="glass-btn glass-btn-sm" id="btnVerticalExpand" type="button" data-i18n-title="btn.expand" title="放大">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 3 21 3 21 9"/>
+              <polyline points="9 21 3 21 3 15"/>
+              <line x1="21" y1="3" x2="14" y2="10"/>
+              <line x1="3" y1="21" x2="10" y2="14"/>
+            </svg>
+          </button>
+          <button class="glass-btn glass-btn-sm glass-btn-danger" id="btnVerticalClose" type="button" data-i18n-title="btn.close" title="关闭">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="move-handle">
+      <button class="glass-btn glass-btn-move" id="btnMove" type="button" data-i18n-title="btn.move" title="按住拖动窗口">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+          <circle cx="12" cy="12" r="2.5"/>
+        </svg>
+        <span data-i18n="btn.moveHint">按住此处移动</span>
+      </button>
+    </div>
+
+    <div class="loading" id="loading">
+      <div class="loading-spinner"></div>
+      <p data-i18n="loading.text">正在获取天气...</p>
+      <button class="glass-btn glass-btn-primary loading-search-btn" id="btnSearchFromLoading" type="button" data-i18n="loading.searchCity">搜索城市</button>
+    </div>
+
+    <main class="content hidden" id="content">
+      <div class="content-scroll">
+      <section class="glass-panel hero-panel">
+        <div class="location-row">
+          <svg class="location-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          <div class="location-info">
+            <button class="city-name-btn" id="cityName" type="button">--</button>
+            <p class="update-time" id="updateTime">--</p>
+          </div>
+        </div>
+
+        <div class="hero-main">
+          <div class="weather-visual">
+            <img class="weather-icon-large" id="weatherIcon" src="" alt="">
+          </div>
+          <div class="hero-temp-block">
+            <div class="hero-temp">
+              <span class="temp-value" id="currentTemp">--</span>
+              <span class="temp-unit">°C</span>
+            </div>
+            <p class="weather-desc" id="weatherDesc">--</p>
+            <p class="feels-like"><span data-i18n="feelsLike">体感</span> <span id="feelsLike">--</span>°C</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="glass-panel stats-panel stats-grid">
+        <div class="stat-item">
+          <span class="stat-label" data-i18n="stat.humidity">湿度</span>
+          <span class="stat-value" id="humidity">--</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label" data-i18n="stat.windSpeed">风速</span>
+          <span class="stat-value" id="windSpeed">--</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label" data-i18n="stat.windDir">风向</span>
+          <span class="stat-value" id="windDir">--</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label" data-i18n="stat.uv">紫外线</span>
+          <span class="stat-value" id="uvIndex">--</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label" data-i18n="stat.rain">降水概率</span>
+          <span class="stat-value" id="rainChance">--</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label" data-i18n="stat.todayRange">今日温度</span>
+          <span class="stat-value" id="todayRange">--</span>
+        </div>
+      </section>
+
+      <section class="glass-panel hourly-panel">
+        <h2 class="panel-title" data-i18n="panel.hourly">逐小时</h2>
+        <div class="hourly-scroll" id="hourlyList"></div>
+      </section>
+
+      <section class="glass-panel daily-panel">
+        <h2 class="panel-title" data-i18n="panel.daily">未来 7 天</h2>
+        <div class="daily-list" id="dailyList"></div>
+      </section>
+      </div>
+    </main>
+
+    <div class="error-panel hidden" id="errorPanel">
+      <p id="errorMessage" data-i18n="error.default">无法获取天气数据</p>
+      <div class="error-actions">
+        <button class="glass-btn glass-btn-primary" id="btnRetry" type="button" data-i18n="error.retryLocate">定位重试</button>
+        <button class="glass-btn glass-btn-primary" id="btnSearchFromError" type="button" data-i18n="error.searchCity">搜索城市</button>
+      </div>
+    </div>
+
+    <div class="city-panel hidden" id="cityPanel">
+      <div class="city-panel-inner glass-panel">
+        <div class="city-panel-header">
+          <h3 data-i18n="city.panelTitle">搜索城市</h3>
+          <button class="glass-btn glass-btn-sm" id="btnCityClose" type="button" data-i18n-title="btn.close" title="关闭">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <input class="city-input" id="cityInput" type="text" data-i18n-placeholder="city.placeholder" placeholder="输入城市名，如：北京、上海" maxlength="30">
+        <div class="city-results" id="cityResults"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/weather.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

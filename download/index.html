@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>天气组件 - 下载</title>
+  <link rel="icon" href="../assets/icon.png" type="image/png">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(145deg, #0f2740 0%, #1a3a5c 45%, #102033 100%);
+      color: #e8f1fa;
+      min-height: 100vh;
+      padding: 32px 20px 40px;
+    }
+    .wrap { max-width: 680px; margin: 0 auto; }
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 16px;
+      padding: 28px 30px;
+    }
+    .head { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; }
+    .head img { width: 64px; height: 64px; }
+    h1 { font-size: 26px; }
+    .sub { color: rgba(232, 241, 250, 0.72); font-size: 14px; margin-top: 6px; line-height: 1.5; }
+    label { display: block; font-size: 13px; margin: 18px 0 8px; }
+    select, input[type=text] {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(0, 0, 0, 0.25);
+      color: #fff;
+      font-size: 14px;
+    }
+    .path-row { display: flex; gap: 10px; margin-top: 8px; }
+    .path-row input { flex: 1; }
+    .btn {
+      display: inline-block;
+      text-align: center;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      color: #fff;
+    }
+    .btn-primary { background: #3d8fd4; width: 100%; margin-top: 18px; }
+    .btn-secondary { background: rgba(255,255,255,0.14); white-space: nowrap; }
+    .btn-danger { background: rgba(220,80,80,0.85); width: 100%; margin-top: 10px; }
+    .steps { margin-top: 20px; padding: 16px; border-radius: 12px; background: rgba(0,0,0,0.22); font-size: 13px; line-height: 1.7; }
+    .steps ol { padding-left: 20px; }
+    .note { margin-top: 14px; font-size: 12px; color: rgba(232,241,250,0.55); line-height: 1.6; }
+    .hidden { display: none; }
+    .log { margin-top: 14px; padding: 12px; border-radius: 10px; background: rgba(0,0,0,0.28); font-size: 12px; min-height: 48px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="head">
+        <img src="../assets/icon.png" alt="">
+        <div>
+          <h1 id="titleText">天气组件</h1>
+          <p class="sub" id="subtitleText">透明桌面天气小工具 - 下载与安装</p>
+        </div>
+      </div>
+
+      <label id="labelLang" for="langSelect">界面语言</label>
+      <select id="langSelect">
+        <option value="zh-CN">简体中文</option>
+        <option value="en">English</option>
+      </select>
+
+      <label id="labelPath" for="installPath">安装位置（离线安装包解压后可修改）</label>
+      <div class="path-row">
+        <input type="text" id="installPath" readonly>
+        <button type="button" class="btn btn-secondary" id="btnBrowse">浏览...</button>
+      </div>
+
+      <a class="btn btn-primary" id="btnDownload" href="../">下载源码包 (ZIP)</a>
+      <button type="button" class="btn btn-primary hidden" id="btnOpenSetup">打开安装程序</button>
+      <button type="button" class="btn btn-danger" id="btnUninstall">卸载说明</button>
+
+      <div class="steps" id="stepsBox"></div>
+      <div class="log hidden" id="logBox"></div>
+      <p class="note" id="hintText"></p>
+    </div>
+  </div>
+
+  <script>
+    var uiLang = "zh-CN";
+    var I18N = {
+      "zh-CN": {
+        title: "天气组件",
+        subtitle: "透明桌面天气小工具 - 下载与安装",
+        labelLang: "界面语言（安装时写入，启动后界面按此显示）",
+        labelPath: "安装位置",
+        browse: "浏览...",
+        download: "1. 下载 ZIP 并解压",
+        openSetup: "2. 打开安装程序 (installer\\setup.hta)",
+        uninstall: "卸载说明",
+        hint: "完整安装功能（自定义路径、创建快捷方式、卸载）请在解压后双击根目录的「下载安装.bat」，或在资源管理器中双击 installer\\setup.hta。",
+        steps: "<strong>安装步骤</strong><ol><li>点击上方按钮下载/获取 ZIP 并解压到任意目录</li><li>进入解压目录，双击 <code>下载安装.bat</code></li><li>选择<strong>界面语言</strong>、<strong>安装位置</strong>，按需勾选<strong>创建桌面快捷方式</strong>或<strong>开机自动启动</strong>，点击「开始安装」</li><li>若创建了快捷方式则从桌面启动，否则运行安装目录下的 <code>scripts\\launch.vbs</code></li></ol>",
+        uninstallInfo: "卸载：进入安装目录，双击 uninstall.bat。",
+        pathHint: "浏览器中无法直接选择文件夹。请解压后在 setup.hta 中选择安装位置。",
+        savedLang: "已记住界面语言偏好："
+      },
+      en: {
+        title: "Weather Widget",
+        subtitle: "Transparent desktop weather widget - Download & Install",
+        labelLang: "UI language (saved for the app after install)",
+        labelPath: "Install location",
+        browse: "Browse...",
+        download: "1. Download ZIP and extract",
+        openSetup: "2. Open installer (installer\\setup.hta)",
+        uninstall: "Uninstall info",
+        hint: "For full install (custom path, shortcut, uninstall), run Download-Install.bat in the extracted folder, or open installer\\setup.hta.",
+        steps: "<strong>Steps</strong><ol><li>Download the ZIP and extract it</li><li>Run <code>Download-Install.bat</code> in the extracted folder</li><li>Choose <strong>language</strong>, <strong>install folder</strong>, optionally check <strong>Create desktop shortcut</strong>, then Install</li><li>Launch from the desktop shortcut if created, otherwise run <code>scripts\\launch.vbs</code></li></ol>",
+        uninstallInfo: "Uninstall: open the install folder and run uninstall.bat.",
+        pathHint: "Folder picker is not available in the browser. Choose the path in setup.hta after extracting the ZIP.",
+        savedLang: "Saved language preference: "
+      }
+    };
+
+    function t(key) {
+      return (I18N[uiLang] || I18N["zh-CN"])[key] || key;
+    }
+
+    function applyUi() {
+      uiLang = document.getElementById("langSelect").value;
+      localStorage.setItem("weather-widget-install-lang", uiLang);
+      document.documentElement.lang = uiLang;
+      document.getElementById("titleText").textContent = t("title");
+      document.getElementById("subtitleText").textContent = t("subtitle");
+      document.getElementById("labelLang").textContent = t("labelLang");
+      document.getElementById("labelPath").textContent = t("labelPath");
+      document.getElementById("btnBrowse").textContent = t("browse");
+      document.getElementById("btnDownload").textContent = t("download");
+      document.getElementById("btnOpenSetup").textContent = t("openSetup");
+      document.getElementById("btnUninstall").textContent = t("uninstall");
+      document.getElementById("hintText").textContent = t("hint");
+      document.getElementById("stepsBox").innerHTML = t("steps");
+      document.getElementById("installPath").value = t("pathHint");
+    }
+
+    document.getElementById("langSelect").addEventListener("change", applyUi);
+    document.getElementById("btnBrowse").addEventListener("click", function () {
+      document.getElementById("logBox").classList.remove("hidden");
+      document.getElementById("logBox").textContent = t("pathHint");
+    });
+    document.getElementById("btnUninstall").addEventListener("click", function () {
+      document.getElementById("logBox").classList.remove("hidden");
+      document.getElementById("logBox").textContent = t("uninstallInfo");
+    });
+
+    var saved = localStorage.getItem("weather-widget-install-lang");
+    if (saved) document.getElementById("langSelect").value = saved;
+    applyUi();
+  </script>
+</body>
+</html>

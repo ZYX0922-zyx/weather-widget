@@ -1,0 +1,38 @@
+{
+  "name": "weather-widget",
+  "productName": "天气组件",
+  "version": "1.0.0",
+  "description": "Transparent frosted-glass desktop weather widget for Windows",
+  "main": "main.js",
+  "author": "ZYX0922-zyx",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZYX0922-zyx/weather-widget.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ZYX0922-zyx/weather-widget/issues"
+  },
+  "homepage": "https://github.com/ZYX0922-zyx/weather-widget#readme",
+  "keywords": [
+    "electron",
+    "weather",
+    "desktop-widget",
+    "windows",
+    "transparent",
+    "open-meteo"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "postinstall": "node scripts/postinstall.js"
+  },
+  "dependencies": {
+    "koffi": "^2.11.0"
+  },
+  "devDependencies": {
+    "electron": "^35.0.0",
+    "png-to-ico": "^2.1.8"
+  }
+}
