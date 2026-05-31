@@ -70,18 +70,6 @@ weather-widget/
 └── install.bat          # One-click install (creates desktop shortcut)
 ```
 
-## Publish to GitHub
-
-```bash
-git init
-git add .
-git commit -m "Initial release: transparent desktop weather widget"
-git branch -M main
-git remote add origin https://github.com/ZYX0922-zyx/weather-widget.git
-git push -u origin main
-```
-
-Replace `ZYX0922-zyx` with your GitHub account.
 
 ## License
 
